@@ -15,7 +15,7 @@ public class Article {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idArtiles;
+    private Long idArticles;
 
     @Column(nullable = false, length = 255)
     private String titreArt;

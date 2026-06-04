@@ -23,7 +23,7 @@ public class Resume {
     @Column(nullable = false)
     private LocalDateTime dateGeneration;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "article_id", nullable = false, unique = true)
     private Article article;
 }
