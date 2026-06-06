@@ -17,8 +17,7 @@ public class ResumeService {
     }
 
     public Resume getResumeById(Long id) {
-        return resumeRepository.findById(id)
-                .orElseThrow(() ->
+        return resumeRepository.findById(id).orElseThrow(() ->
                         new RuntimeException("Résumé introuvable"));
     }
 }

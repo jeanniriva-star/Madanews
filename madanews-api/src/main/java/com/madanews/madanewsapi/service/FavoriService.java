@@ -23,6 +23,8 @@ public class FavoriService {
 
     @Autowired
     private ArticleRepository articleRepository;
+    @Autowired
+    private NotificationService notificationService;
 
 
 
@@ -53,7 +55,16 @@ public class FavoriService {
         favori.setArticle(article);
         favori.setDateAjoutFav(LocalDateTime.now());
 
-        return favoriRepository.save(favori);
+        Favori favoriSauvegarde =
+                favoriRepository.save(favori);
+
+        notificationService.creerNotification(
+                utilisateur,
+                "Favori",
+                "Article ajouté aux favoris avec succès."
+        );
+
+        return favoriSauvegarde;
     }
 
     public List<Favori> getFavorisUtilisateur(Long idUtilisateur) {

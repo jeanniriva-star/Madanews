@@ -22,7 +22,6 @@ public class SourceService {
 
     public Source getSourceById(Long id) {
         return sourceRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Source introuvable"));
+                .orElseThrow(() ->new RuntimeException("Source introuvable"));
     }
 }

@@ -45,34 +45,24 @@ public class HistoriqueLectureService {
 
         historique.setUtilisateur(utilisateur);
         historique.setArticle(article);
-        historique.setTempsLecture(
-                dto.getTempsLecture()
-        );
-        historique.setDateLecture(
-                LocalDateTime.now()
-        );
+        historique.setTempsLecture(dto.getTempsLecture());
+        historique.setDateLecture(LocalDateTime.now());
 
-        return historiqueLectureRepository.save(
-                historique
-        );
+        return historiqueLectureRepository.save( historique);
     }
 
-    public List<HistoriqueLecture>
-    getHistoriqueUtilisateur(
+    public List<HistoriqueLecture> getHistoriqueUtilisateur(
             Long idUtilisateurs
     ) {
 
-        return historiqueLectureRepository
-                .findByUtilisateur_IdUtilisateurs(
+        return historiqueLectureRepository.findByUtilisateur_IdUtilisateurs(
                         idUtilisateurs
                 );
     }
 
-    public void supprimerHistorique(
-            Long idHistorique
+    public void supprimerHistorique(Long idHistorique
     ) {
 
-        historiqueLectureRepository
-                .deleteById(idHistorique);
+        historiqueLectureRepository.deleteById(idHistorique);
     }
 }
