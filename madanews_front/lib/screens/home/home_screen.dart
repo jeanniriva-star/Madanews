@@ -4,6 +4,8 @@ import '/widgets/featured_news_card.dart';
 import '/screens/article/article_detail_screen.dart';
 import '/models/article.dart';
 import 'dart:async';
+import '/services/article_service.dart';
+import '/data/article_store.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,50 +19,66 @@ class _HomeScreenState extends State<HomeScreen> {
   String searchQuery = "";
   Timer? _debounce;
   final TextEditingController searchController = TextEditingController();
-  final Set<String> favoriteArticles = {};
 
 
 
-  final List<Article> articles = [
-    const Article(
-      title: "Nouvelle actualité",
-      description: "Petit résumé de l'actualité affichée dans la liste.",
-      category: "Sport",
-      date: "16 Juin",
-      content: "Contenu complet de l'article de démonstration.",
-    ),
-    const Article(
-      title: "Actualité économique",
-      description: "Petit résumé de l'actualité affichée dans la liste.",
-      category: "Économie",
-      date: "16 Juin",
-      content: "Contenu complet de l'article économique.",
-    ),
-    const Article(
-      title: "Actualité technologique",
-      description: "Petit résumé de l'actualité affichée dans la liste.",
-      category: "Technologie",
-      date: "16 Juin",
-      content: "Contenu complet de l'article technologique.",
-    ),
-  ];
+
+  List<Article> articles = [];
+  bool isLoading = true;
+
+  final ArticleService articleService = ArticleService();
 
   void toggleFavorite(Article article) {
     setState(() {
-      if (favoriteArticles.contains(article.title)) {
-        favoriteArticles.remove(article.title);
+      if (ArticleStore.favorites.contains(article.title)) {
+        ArticleStore.favorites.remove(article.title);
       } else {
-        favoriteArticles.add(article.title);
+        ArticleStore.favorites.add(article.title);
       }
     });
   }
+  Future<void> loadArticles() async {
+    try {
+      final data = await articleService.getArticles();
 
+      setState(() {
+        ArticleStore.articles = data.map<Article>((json) {
+          return Article(
+            id: json["idArticles"],
+            title: json["titreArt"] ?? "",
+            description: json["contenu"] ?? "",
+            category: json["categorie"]["nomCat"] ?? "",
+            date: json["datePublicationArt"] ?? "",
+            content: json["contenu"] ?? "",
+            imageUrl: json["image"],
+          );
+        }).toList();
+        articles = ArticleStore.articles;
+
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+
+      debugPrint(e.toString());
+    }
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    loadArticles();
+  }
   @override
   Widget build(BuildContext context) {
     final categories = [
       "Tous",
       "Politique",
-      "Économie",
+      "E"
+          "conomie",
       "Société",
       "Sport",
       "Culture",
@@ -83,6 +101,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
       return matchCategory && matchSearch;
     }).toList();
+
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -270,10 +294,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     trailing: IconButton(
                       icon: Icon(
-                        favoriteArticles.contains(article.title)
+                        ArticleStore.favorites.contains(article.title)
                             ? Icons.favorite
                             : Icons.favorite_border,
-                        color: favoriteArticles.contains(article.title)
+                        color:ArticleStore.favorites.contains(article.title)
                             ? Colors.red
                             : Colors.grey,
                       ),
@@ -293,8 +317,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   List<Article> get favoriteList {
-    return articles
-        .where((article) => favoriteArticles.contains(article.title))
+    return ArticleStore.articles
+        .where(
+          (article) =>
+          ArticleStore.favorites.contains(article.title),
+    )
         .toList();
   }
 }
